@@ -178,7 +178,7 @@
               const row = document.createElement("tr");
               for (let j = 0; j < this.cols; j++) {
                 const number = j + i * this.cols;
-                const text = FREE.has(number) ? "FREE" : ITEMS[number];
+                const text = FREE.has(number) ? "FREE SPACE (the Log Givers give)" : ITEMS[number];
                 const cell = document.createElement("td");
                 cell.id = `bingo-item-${number}`;
                 cell.classList.add("bingo-item");
