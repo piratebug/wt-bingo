@@ -1,3 +1,3 @@
-# Bingo Web Components
+# White Tiger Bingo
 
-This is a small project I put together to demonstrate the power of Web Components as a replacement for heavier frameworks such as React.
+A simple bingo game for the White Tiger community on Eco, utilizing the bingo components created by tclasen.
