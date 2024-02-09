@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>White Tiger Bingo</title>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,  
+      initial-scale=1.0"
+    />
+    <script>
+      const FREE = new Set([12]);
+      const items = [
+        "libero",
+        "nunc",
+        "consequat",
+        "interdum",
+        "varius",
+        "sit",
+        "amet",
+        "mattis",
+        "vulputate",
+        "enim",
+        "nulla",
+        "aliquet",
+        "porttitor",
+        "lacus",
+        "luctus",
+        "accumsan",
+        "tortor",
+        "posuere",
+        "ac",
+        "ut",
+        "consequat",
+        "semper",
+        "viverra",
+        "nam",
+        "libero",
+        "justo",
+        "laoreet",
+        "sit",
+        "amet",
+        "cursus",
+        "sit",
+        "amet",
+        "dictum",
+        "sit",
+        "amet",
+        "justo",
+        "donec",
+        "enim",
+        "diam",
+        "vulputate",
+        "ut",
+        "pharetra",
+        "sit",
+        "amet",
+        "aliquam",
+        "id",
+        "diam",
+        "maecenas",
+        "ultricies",
+        "mi",
+        "eget",
+        "mauris",
+        "pharetra",
+        "et",
+        "ultrices",
+        "neque",
+        "ornare",
+        "aenean",
+        "euismod",
+        "elementum",
+        "nisi",
+        "quis",
+        "eleifend",
+        "quam",
+        "adipiscing",
+        "vitae",
+        "proin",
+        "sagittis",
+        "nisl",
+        "rhoncus",
+        "mattis",
+        "rhoncus",
+        "urna",
+        "neque",
+        "viverra",
+        "justo",
+        "nec",
+        "ultrices",
+        "dui",
+        "sapien",
+        "eget",
+        "mi",
+        "proin",
+        "sed",
+        "libero",
+        "enim",
+        "sed",
+        "faucibus",
+        "turpis",
+        "in",
+        "eu",
+        "mi",
+        "bibendum",
+        "neque",
+        "egestas",
+        "congue",
+        "quisque",
+        "egestas",
+        "diam",
+        "in",
+      ];
+
+      function load() {
+        const value = localStorage.getItem("value");
+        const data = JSON.parse(value);
+        return data || {};
+      }
+
+      function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+
+      const { savedItems, savedDone } = load();
+
+      const ITEMS = savedItems || shuffle(items);
+      const DONE = new Set(savedDone);
+
+      function save() {
+        const value = JSON.stringify({
+          savedItems: ITEMS,
+          savedDone: [...DONE],
+        });
+        localStorage.setItem("value", value);
+      }
+
+      window.customElements.define(
+        "bingo-card",
+        class extends HTMLElement {
+          constructor() {
+            super();
+          }
+
+          connectedCallback() {
+            this.shadow = this.attachShadow({ mode: "closed" });
+
+            const style = document.createElement("style");
+            style.innerHTML = `
+                table, th, td {
+                    border: 1px solid black;
+                    border-radius: 10px;
+                    text-align: center;
+                }
+
+                td {
+                    height: 10em;
+                    width: 10em;
+                }
+
+                td:hover {
+                  background-color: #D6EEEE;
+                }
+
+                td.checked {
+                  background-color: #A3A3A3;
+                }
+            `;
+            this.shadow.appendChild(style);
+
+            const table = document.createElement("table");
+            for (let i = 0; i < this.rows; i++) {
+              const row = document.createElement("tr");
+              for (let j = 0; j < this.cols; j++) {
+                const number = j + i * this.cols;
+                const text = FREE.has(number) ? "FREE" : ITEMS[number];
+                const cell = document.createElement("td");
+                cell.id = `bingo-item-${number}`;
+                cell.classList.add("bingo-item");
+                if (DONE.has(number)) {
+                  cell.classList.add("checked");
+                }
+                cell.addEventListener("click", () => {
+                  this.toggle(number);
+                });
+                cell.innerText = text;
+                row.appendChild(cell);
+              }
+              table.appendChild(row);
+            }
+            this.shadow.appendChild(table);
+          }
+
+          get rows() {
+            return parseInt(this.getAttribute("rows") || "5");
+          }
+          get cols() {
+            return parseInt(this.getAttribute("cols") || "5");
+          }
+
+          toggle(number) {
+            const item = this.shadow.getElementById(`bingo-item-${number}`);
+            if (item.classList.contains("checked")) {
+              item.classList.remove("checked");
+              DONE.delete(number);
+            } else {
+              item.classList.add("checked");
+              DONE.add(number);
+            }
+            save();
+          }
+        },
+      );
+      save();
+    </script>
+  </head>
+  <body style="margin: 0; padding: 0">
+    <bingo-card />
+  </body>
+</html>
